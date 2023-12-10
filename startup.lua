@@ -1,5 +1,7 @@
 local pretty = require("cc.pretty")
 local inventory = require("inventoried_turtle")
+local coordinatedTurtle = require("coordinated_turtle")
+local miningTurtle = require("mining_turtle")
 
 function placeTorch()
   local torchSlot = inventory.findInInventory("minecraft:torch")
@@ -12,14 +14,11 @@ function placeTorch()
   end
 end
 
-placeTorch()
-
-local coordinatedTurtle = require("coordinated_turtle")
-local miningTurtle = require("mining_turtle")
 
 function act()
   if not coordinatedTurtle.willBeInBounds() then
     print("Out of bounds!")
+    placeTorch()
 
     if not coordinatedTurtle.moveToNextColumn(miningTurtle) then
       print("Move to next column failed!")
@@ -49,6 +48,7 @@ end
 
 if hasEnoughFuelToDoWork() then
   print("Enough fuel to do work!")
+  placeTorch()
 
   while true do
     if not inventory.checkInventory() then
