@@ -12,6 +12,18 @@ function findInInventory(itemName)
   return itemSlot
 end
 
+function itemDetail(itemName)
+  local slot = findInInventory(itemName)
+
+  if not slot then
+    return { count = 0, name = "No Item" }
+  end
+
+  local itemDetails = turtle.getItemDetail(slot)
+
+  return itemDetails
+end
+
 function hasAvailableSlot()
   for slot = 1, 16 do
 
@@ -31,4 +43,8 @@ function checkInventory()
   end
 end
 
-return { checkInventory = checkInventory, findInInventory = findInInventory }
+return {
+  checkInventory = checkInventory,
+  findInInventory = findInInventory,
+  itemDetail = itemDetail
+}
