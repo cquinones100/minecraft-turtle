@@ -44,12 +44,14 @@ function cleanInventory()
   end
 end
 
-function work()
+function work(scale)
   turtle.dig()
   turtle.digUp()
   turtle.suck()
 
-  cleanInventory()
+  if scale and scale > 10 then
+    cleanInventory()
+  end
 end
 
 return { work = work }

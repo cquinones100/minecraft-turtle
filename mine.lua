@@ -30,7 +30,7 @@ function act()
   end
 
   coordinatedTurtle.moveForward()
-  miningTurtle.work()
+  miningTurtle.work(coordinatedTurtle.getScale())
 
   return true
 end
