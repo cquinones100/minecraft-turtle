@@ -1,7 +1,7 @@
 local direction = 1
 local coordinates = {x = 1, y = 1}
 local cache = {}
-local scale = 30
+local scale = 10
 local numColumns = 1
 
 function getDirection()
