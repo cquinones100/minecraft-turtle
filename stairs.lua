@@ -1,5 +1,5 @@
 local fuel = require("fueled_turtle")
-local target = 20
+local target = 4
 local inventory = require("inventoried_turtle")
 local blockName = "minecraft:cobbled_deepslate"
 local stairBlockName = "minecraft:cobbled_deepslate_stairs"
@@ -18,7 +18,6 @@ function placeBlock()
   local stairBlockSlot = inventory.findInInventory(stairBlockName)
 
   if blockSlot and stairBlockSlot then
-    turtle.down()
     turtle.turnLeft()
     turtle.turnLeft()
 
@@ -111,7 +110,7 @@ function run()
         turtle.down()
       end
 
-      turtle.forward()
+      print("placing block")
 
       if not placeBlock() then
         break
