@@ -13,6 +13,11 @@ function cleanInventory()
     "minecraft:raw_iron",
     "minecraft:raw_diamond",
     "minecraft:raw_emarald",
+    "minecraft:dirt",
+    "minecraft:oak_fence",
+    "minecraft:oak_planks",
+    "minecraft:rail",
+    "minecraft:torch",
   }
 
   for slot = 1, 16 do
