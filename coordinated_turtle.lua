@@ -20,6 +20,10 @@ function getScale()
   return scale
 end
 
+function getNumColumns()
+  return numColumns
+end
+
 function facingUp()
   return direction == 1
 end
@@ -268,4 +272,5 @@ return {
   getCache = getCache,
   moveToNextColumn = moveToNextColumn,
   getScale = getScale,
+  getNumColumns = getNumColumns,
 }

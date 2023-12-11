@@ -14,11 +14,13 @@ function placeTorch()
   end
 end
 
-
 function act()
   if not coordinatedTurtle.willBeInBounds() then
     print("Out of bounds!")
-    placeTorch()
+
+    if coordinatedTurtle.getNumColumns() % 4 == 0 then
+      placeTorch()
+    end
 
     if not coordinatedTurtle.moveToNextColumn(miningTurtle) then
       print("Move to next column failed!")
