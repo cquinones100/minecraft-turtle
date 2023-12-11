@@ -46,10 +46,24 @@ function hasEnoughFuelToDoWork()
   return fuel.fueled(targetFuel)
 end
 
+function checkTorchAvailability()
+  local itemDetail = inventory.itemDetail("minecraft:torch")
+  local target = coordinatedTurtle.getScale() / 4
+
+  if itemDetail.count < target then
+    print("Please add some torches! " .. target - itemDetail.count .. " more needed")
+
+    os.sleep(1)
+
+    return checkTorchAvailability()
+  end
+end
+
 function run()
   if hasEnoughFuelToDoWork() then
+    checkTorchAvailability()
+
     print("Enough fuel to do work!")
-    placeTorch()
 
     while true do
       if not inventory.checkInventory() then
