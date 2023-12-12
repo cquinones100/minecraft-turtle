@@ -1,4 +1,5 @@
 local Socket = require("socket")
+local mine = require("mine").mine
 
 function run()
   print("Establishing connection to server")
@@ -24,6 +25,22 @@ function run()
 
   socket:onMessage("move", function ()
     turtle.forward()
+  end)
+
+  socket:onMessage("say_hello", function ()
+    local i = 1
+
+    socket:onTick("say_hello", function (cancel)
+      print("hello: " .. i)
+
+      if i == 5 then
+        print("done")
+
+        cancel()
+      end
+
+      i = i + 1
+    end)
   end)
 
   socket:listen()
