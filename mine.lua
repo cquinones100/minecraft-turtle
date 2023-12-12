@@ -59,6 +59,20 @@ function checkTorchAvailability()
   end
 end
 
+function mine()
+  if not inventory.checkInventory() then
+    print("Inventory full!")
+
+    return false
+  else
+    if not act() then
+      return false
+    end
+  end
+
+  return true
+end
+
 function run()
   if hasEnoughFuelToDoWork() then
     checkTorchAvailability()
@@ -66,16 +80,8 @@ function run()
     print("Enough fuel to do work!")
 
     while true do
-      if not inventory.checkInventory() then
-        print("Inventory full!")
-
-        os.sleep(1000)
-      else
-        if not act() then
-          print("aborting")
-
-          break
-        end
+      if not mine() then
+        print("aborting")
       end
     end
   else
@@ -83,4 +89,4 @@ function run()
   end
 end
 
-return { run = run }
+return { run = run, mine = mine }

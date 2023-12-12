@@ -36,7 +36,7 @@ function run()
       if i == 5 then
         print("done")
 
-        cancel()
+        cancel("MovementChannel")
       end
 
       i = i + 1
