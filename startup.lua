@@ -1,52 +1,65 @@
-local files = {
-  mine = {
-    file = "mine.lua",
-    url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/mine.lua",
-  },
+function downloadFromGithub()
+  local files = {
+    mine = {
+      file = "mine.lua",
+      url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/mine.lua",
+    },
 
-  stairs = {
-    file = "stairs.lua",
-    url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/stairs.lua",
-  },
+    stairs = {
+      file = "stairs.lua",
+      url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/stairs.lua",
+    },
 
-  coordinatedTurtle = {
-    file = "coordinated_turtle.lua",
-    url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/coordinated_turtle.lua",
-  },
+    coordinatedTurtle = {
+      file = "coordinated_turtle.lua",
+      url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/coordinated_turtle.lua",
+    },
 
-  fueledTurtle = {
-    file = "fueled_turtle.lua",
-    url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/fueled_turtle.lua",
-  },
+    fueledTurtle = {
+      file = "fueled_turtle.lua",
+      url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/fueled_turtle.lua",
+    },
 
-  inventoriedTurtle = {
-    file = "inventoried_turtle.lua",
-    url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/inventoried_turtle.lua",
-  },
+    inventoriedTurtle = {
+      file = "inventoried_turtle.lua",
+      url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/inventoried_turtle.lua",
+    },
 
-  miningTurtle = {
-    file = "mining_turtle.lua",
-    url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/mining_turtle.lua",
-  },
-}
+    miningTurtle = {
+      file = "mining_turtle.lua",
+      url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/mining_turtle.lua",
+    },
 
-for _, file in pairs(files) do
-  local timestamp = os.time()
+    connectedTurtle = {
+      file = "connected_turtle.lua",
+      url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/connected_turtle.lua",
+    },
 
-  print("Downloading " .. file.file .. "...")
+    socket = {
+      file = "socket.lua",
+      url = "https://raw.githubusercontent.com/cquinones100/minecraft-turtle/main/socket.lua",
+    },
+  }
 
-  local request = http.get(file.url .. "?t=" .. timestamp)
+  for _, file in pairs(files) do
+    local timestamp = os.time()
 
-  local contents = request.readAll()
-  request.close()
+    print("Downloading " .. file.file .. "...")
 
-  local file = fs.open(file.file, "w")
+    local request = http.get(file.url .. "?t=" .. timestamp)
 
-  file.write(contents)
+    local contents = request.readAll()
+    request.close()
+
+    local file = fs.open(file.file, "w")
+
+    file.write(contents)
+  end
 end
 
--- local stairs = require("stairs")
-local mine = require("mine")
+downloadFromGithub()
 
-mine.run()
+local connected_turtle = require("connected_turtle")
+
+connected_turtle.run()
 
