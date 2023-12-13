@@ -275,6 +275,9 @@
 --   getNumColumns = getNumColumns,
 -- }
 --
+--
+
+local coordinates = {}
 
 function setupCoordinates()
   print("Enter your coordinates:")
@@ -290,7 +293,32 @@ function setupCoordinates()
   print("facing: ")
   facing = read()
 
-  return { x = x, y = y, z = z, direction = facing }
+  coordinates = { x = x, y = y, z = z, direction = facing }
+
+  return coordinates
 end
 
-return { setupCoordinates = setupCoordinates }
+function forward()
+  turtle.forward()
+
+  if coordinates.direction == "north" then
+    coordinates.z = coordinates.z - 1
+  elseif coordinates.direction == "south" then
+    coordinates.z = coordinates.z + 1
+  elseif coordinates.direction == "east" then
+    coordinates.x = coordinates.x + 1
+  elseif coordinates.direction == "west" then
+    coordinates.x = coordinates.x - 1
+  end
+end
+
+function getCoordinates()
+  return coordinates
+end
+
+return {
+  setupCoordinates = setupCoordinates,
+  forward = forward,
+  getCoordinates = getCoordinates
+}
+

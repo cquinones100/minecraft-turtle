@@ -28,7 +28,21 @@ function run()
   socket:onMessage("roll_call", rollCall)
 
   socket:onMessage("move", function ()
-    turtle.forward()
+    local i = 1
+
+    socket:onTick("move", function (cancel)
+      coordinatedTurtle.forward()
+
+      if i == 5 then
+        print("done moving")
+
+        cancel({
+          coordinates = coordinatedTurtle.getCoordinates(),
+        })
+      end
+
+      i = i + 1
+    end)
   end)
 
   socket:onMessage("say_hello", function ()

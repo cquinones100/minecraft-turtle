@@ -79,16 +79,27 @@ end
 
 function Socket:onTick(identifier, callback)
   self.actions[identifier] = function()
-    callback(function ()
+    callback(function (data)
       self.actions[identifier] = nil
 
-      self:sendMessage({
+      local message_table = {
         command = "message",
 
-        data = textutils.serialiseJSON({
+        data = {
           action = identifier .. "_complete",
-        }),
-      })
+          computer_id = os.getComputerID(),
+        },
+      }
+
+      if data then
+        for key, value in pairs(data) do
+          message_table.data[key] = value
+        end
+      end
+
+      message_table.data = textutils.serialiseJSON(message_table.data)
+
+      self:sendMessage(message_table)
     end)
   end
 end
