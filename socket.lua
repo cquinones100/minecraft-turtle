@@ -51,9 +51,13 @@ function Socket:expectResponse(type)
   end
 end
 
-function Socket:subscribe()
+function Socket:subscribe(coordinates)
   self:sendMessage({
     command = "subscribe",
+
+    data = {
+      coordinates = coordinates,
+    },
   }, "confirm_subscription")
 end
 

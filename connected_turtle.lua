@@ -1,27 +1,31 @@
 local Socket = require("socket")
-local mine = require("mine").mine
+local coordinatedTurtle = require("coordinated_turtle")
 
 function run()
-  print("Establishing connection to server")
+  local coordinates = coordinatedTurtle.setupCoordinates()
 
+  print("Establishing connection to server")
   local socket = Socket:new("MovementChannel")
 
-  socket:subscribe()
+  socket:subscribe(coordinates)
 
-  print("connected")
-
-  socket:onMessage("roll_call", function (data)
-    print("responding to roll call")
-
+  function rollCall()
     socket:sendMessage({
       command = "message",
 
       data = textutils.serialiseJSON({
         action = "acknowledgement",
         computer_id = os.getComputerID(),
+        coordinates = coordinates,
       }),
     })
-  end)
+  end
+
+  rollCall()
+
+  print("connected")
+
+  socket:onMessage("roll_call", rollCall)
 
   socket:onMessage("move", function ()
     turtle.forward()
