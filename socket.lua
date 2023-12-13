@@ -1,12 +1,14 @@
 Socket = {}
 
-function Socket:new()
+function Socket:new(channel)
   local obj = {
     ws = assert(http.websocket("ws://localhost:3001/cable")),
 
     hooks = {},
 
     actions = {},
+
+    channel = channel,
   }
 
   setmetatable(obj, self)
@@ -16,11 +18,13 @@ function Socket:new()
   return obj
 end
 
-function Socket:sendMessage(channel, table, expect_response)
-  table.identifier = textutils.serialiseJSON({
-    channel = channel,
-    computer_id = os.getComputerID(),
-  })
+function Socket:sendMessage(table, expect_response)
+  local identifier = table.identifier or {}
+
+  identifier.channel = self.channel
+  identifier.computer_id = os.getComputerID()
+
+  table.identifier = textutils.serialiseJSON(identifier)
 
   local serialized_table = textutils.serialiseJSON(table)
 
@@ -47,8 +51,8 @@ function Socket:expectResponse(type)
   end
 end
 
-function Socket:subscribe(channel)
-  self:sendMessage(channel, {
+function Socket:subscribe()
+  self:sendMessage({
     command = "subscribe",
   }, "confirm_subscription")
 end
@@ -71,10 +75,10 @@ end
 
 function Socket:onTick(identifier, callback)
   self.actions[identifier] = function()
-    callback(function (channel)
+    callback(function ()
       self.actions[identifier] = nil
 
-      self:sendMessage(channel, {
+      self:sendMessage({
         command = "message",
 
         data = textutils.serialiseJSON({

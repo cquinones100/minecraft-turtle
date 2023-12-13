@@ -4,16 +4,16 @@ local mine = require("mine").mine
 function run()
   print("Establishing connection to server")
 
-  local socket = Socket:new()
+  local socket = Socket:new("MovementChannel")
 
-  socket:subscribe("MovementChannel")
+  socket:subscribe()
 
   print("connected")
 
   socket:onMessage("roll_call", function (data)
     print("responding to roll call")
 
-    socket:sendMessage("MovementChannel", {
+    socket:sendMessage({
       command = "message",
 
       data = textutils.serialiseJSON({
@@ -36,7 +36,7 @@ function run()
       if i == 5 then
         print("done")
 
-        cancel("MovementChannel")
+        cancel()
       end
 
       i = i + 1
