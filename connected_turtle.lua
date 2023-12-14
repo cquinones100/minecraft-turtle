@@ -5,7 +5,7 @@ function run()
   local coordinates = coordinatedTurtle.setupCoordinates()
 
   print("Establishing connection to server")
-  local socket = Socket:new("MovementChannel")
+  local socket = Socket:new("RobotChannel")
 
   socket:subscribe(coordinates)
 
@@ -32,6 +32,8 @@ function run()
 
     socket:onTick("move", function (cancel)
       coordinatedTurtle.forward()
+
+      rollCall()
 
       if i == 5 then
         print("done moving")

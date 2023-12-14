@@ -269,7 +269,7 @@
 --   recordSpace = recordSpace,
 --   getDirection = getDirection,
 --   getCoordinates = getCoordinates,
---   getCache = getCache,
+--   getCache = getCache,jjj
 --   moveToNextColumn = moveToNextColumn,
 --   getScale = getScale,
 --   getNumColumns = getNumColumns,
@@ -299,16 +299,16 @@ function setupCoordinates()
 end
 
 function forward()
-  turtle.forward()
-
-  if coordinates.direction == "north" then
-    coordinates.z = coordinates.z - 1
-  elseif coordinates.direction == "south" then
-    coordinates.z = coordinates.z + 1
-  elseif coordinates.direction == "east" then
-    coordinates.x = coordinates.x + 1
-  elseif coordinates.direction == "west" then
-    coordinates.x = coordinates.x - 1
+  if turtle.forward() then
+    if coordinates.direction == "north" then
+      coordinates.z = coordinates.z - 1
+    elseif coordinates.direction == "south" then
+      coordinates.z = coordinates.z + 1
+    elseif coordinates.direction == "east" then
+      coordinates.x = coordinates.x + 1
+    elseif coordinates.direction == "west" then
+      coordinates.x = coordinates.x - 1
+    end
   end
 end
 
