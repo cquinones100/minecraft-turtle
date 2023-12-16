@@ -1,6 +1,35 @@
 local Socket = require("socket")
 local coordinatedTurtle = require("coordinated_turtle")
 
+function mine(theCoordinatedTurtle, onError)
+  print("MINING")
+  if theCoordinatedTurtle.getFuelLevel() < 1 then
+    if not theCoordinatedTurtle.refuel() then
+      print("Not enough fuel to do work!")
+
+      onError()
+
+      return
+    end
+  end
+
+  theCoordinatedTurtle.forward()
+
+  if theCoordinatedTurtle.detectDown() then
+    theCoordinatedTurtle.dig()
+
+    if theCoordinatedTurtle.detectUp() then
+      theCoordinatedTurtle.digUp()
+    end
+
+    theCoordinatedTurtle.suck()
+  else
+    theCoordinatedTurtle.back()
+
+    onError()
+  end
+end
+
 function run()
   local coordinates = coordinatedTurtle.setupCoordinates()
 
@@ -33,8 +62,6 @@ function run()
     socket:onTick("move", function (cancel)
       coordinatedTurtle.forward()
 
-      rollCall()
-
       if i == 5 then
         print("done moving")
 
@@ -44,6 +71,26 @@ function run()
       end
 
       i = i + 1
+    end)
+  end)
+
+  local cancelMining = nil
+
+  socket:onMessage("mine", function ()
+    local i = 1
+
+    socket:onTick("mine", function (cancel)
+      cancelMining = cancel
+
+      if i % 5 == 0 then
+        rollCall()
+      end
+
+      mine(coordinatedTurtle, function ()
+        cancel({
+          coordinates = coordinatedTurtle.getCoordinates(),
+        })
+      end)
     end)
   end)
 

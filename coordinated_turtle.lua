@@ -316,9 +316,54 @@ function getCoordinates()
   return coordinates
 end
 
+function dig()
+  turtle.dig()
+end
+
+function digUp()
+  turtle.digUp()
+end
+
+function suck()
+  turtle.suck()
+end
+
+function detect()
+  return turtle.detect()
+end
+
+function detectUp()
+  return turtle.detectUp()
+end
+
+function detectDown()
+  return turtle.detectDown()
+end
+
+function back()
+  turtle.back()
+end
+
+function getFuelLevel()
+  return turtle.getFuelLevel()
+end
+
+function refuel()
+  return turtle.refuel()
+end
+
 return {
   setupCoordinates = setupCoordinates,
   forward = forward,
-  getCoordinates = getCoordinates
+  getCoordinates = getCoordinates,
+  dig = dig,
+  digUp = digUp,
+  suck = suck,
+  detect = detect,
+  detectUp = detectUp,
+  detectDown = detectDown,
+  back = back,
+  getFuelLevel = getFuelLevel,
+  refuel = refuel,
 }
 
