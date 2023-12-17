@@ -61,47 +61,8 @@ function Socket:subscribe(coordinates)
   }, "confirm_subscription")
 end
 
-function Socket:receive(callback)
-  local data = self.ws.receive()
-
-  if data then
-    local json_data = textutils.unserialiseJSON(data)
-
-    if json_data then
-      callback(json_data)
-    end
-  end
-end
-
-function Socket:onMessage(type, callback)
-  self.hooks[type] = callback
-end
-
-function Socket:onTick(identifier, callback)
-  self.actions[identifier] = function()
-    callback(function (data)
-      self.actions[identifier] = nil
-
-      local message_table = {
-        command = "message",
-
-        data = {
-          action = identifier .. "_complete",
-          computer_id = os.getComputerID(),
-        },
-      }
-
-      if data then
-        for key, value in pairs(data) do
-          message_table.data[key] = value
-        end
-      end
-
-      message_table.data = textutils.serialiseJSON(message_table.data)
-
-      self:sendMessage(message_table)
-    end)
-  end
+function Socket:onMessage(callback)
+  table.insert(self.hooks, callback)
 end
 
 function Socket:handleData(data, callback)
@@ -117,12 +78,8 @@ function Socket:readMessages()
 
   if event ~= nil then
     self:handleData(event, function (data)
-      if type(data.message) == "table" then
-        for type, callback in pairs(self.hooks) do
-          if data.message.type == type then
-            callback(data.message)
-          end
-        end
+      for _, hook in ipairs(self.hooks) do
+        hook(data)
       end
     end)
   end
@@ -137,7 +94,6 @@ end
 function Socket:listen()
   while true do
     self:readMessages()
-    self:doActions()
   end
 end
 

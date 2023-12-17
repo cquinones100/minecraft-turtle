@@ -1,37 +1,25 @@
 local Socket = require("socket")
-local coordinatedTurtle = require("coordinated_turtle")
+local pretty = require "cc.pretty"
 
-function mine(theCoordinatedTurtle, onError)
-  print("MINING")
-  if theCoordinatedTurtle.getFuelLevel() < 1 then
-    if not theCoordinatedTurtle.refuel() then
-      print("Not enough fuel to do work!")
+function setupCoordinates()
+  print("Enter your coordinates:")
+  print("x: ")
+  local x = read()
 
-      onError()
+  print("y: ")
+  local y = read()
 
-      return
-    end
-  end
+  print("z: ")
+  local z = read()
 
-  theCoordinatedTurtle.forward()
+  print("facing: ")
+  local facing = read()
 
-  if theCoordinatedTurtle.detectDown() then
-    theCoordinatedTurtle.dig()
-
-    if theCoordinatedTurtle.detectUp() then
-      theCoordinatedTurtle.digUp()
-    end
-
-    theCoordinatedTurtle.suck()
-  else
-    theCoordinatedTurtle.back()
-
-    onError()
-  end
+  return { x = x, y = y, z = z, direction = facing }
 end
 
 function run()
-  local coordinates = coordinatedTurtle.setupCoordinates()
+  local coordinates = setupCoordinates()
 
   print("Establishing connection to server")
   local socket = Socket:new("RobotChannel")
@@ -52,62 +40,12 @@ function run()
 
   rollCall()
 
-  print("connected")
-
-  socket:onMessage("roll_call", rollCall)
-
-  socket:onMessage("move", function ()
-    local i = 1
-
-    socket:onTick("move", function (cancel)
-      coordinatedTurtle.forward()
-
-      if i == 5 then
-        print("done moving")
-
-        cancel({
-          coordinates = coordinatedTurtle.getCoordinates(),
-        })
+  socket:onMessage(function(data)
+    if type(data.message) == "table" then
+      if data.message.type == "mine" then
+        print("MINING 3")
       end
-
-      i = i + 1
-    end)
-  end)
-
-  local cancelMining = nil
-
-  socket:onMessage("mine", function ()
-    local i = 1
-
-    socket:onTick("mine", function (cancel)
-      cancelMining = cancel
-
-      if i % 5 == 0 then
-        rollCall()
-      end
-
-      mine(coordinatedTurtle, function ()
-        cancel({
-          coordinates = coordinatedTurtle.getCoordinates(),
-        })
-      end)
-    end)
-  end)
-
-  socket:onMessage("say_hello", function ()
-    local i = 1
-
-    socket:onTick("say_hello", function (cancel)
-      print("hello: " .. i)
-
-      if i == 5 then
-        print("done")
-
-        cancel()
-      end
-
-      i = i + 1
-    end)
+    end
   end)
 
   socket:listen()
