@@ -1,8 +1,9 @@
+local pretty = require "cc.pretty"
 Socket = {}
 
-function Socket:new(channel)
+function Socket:new(url)
   local obj = {
-    ws = assert(http.websocket("ws://localhost:3001/cable")),
+    ws = assert(http.websocket(url)),
 
     hooks = {},
 
@@ -18,21 +19,8 @@ function Socket:new(channel)
   return obj
 end
 
-function Socket:sendMessage(table, expect_response)
-  local identifier = table.identifier or {}
-
-  identifier.channel = self.channel
-  identifier.computer_id = os.getComputerID()
-
-  table.identifier = textutils.serialiseJSON(identifier)
-
-  local serialized_table = textutils.serialiseJSON(table)
-
-  self.ws.send(serialized_table)
-
-  if expect_response then
-    self:expectResponse(expect_response)
-  end
+function Socket:send(message)
+  self.ws.send(message)
 end
 
 function Socket:expectResponse(type)
@@ -49,16 +37,6 @@ function Socket:expectResponse(type)
       end
     end
   end
-end
-
-function Socket:subscribe(coordinates)
-  self:sendMessage({
-    command = "subscribe",
-
-    data = {
-      coordinates = coordinates,
-    },
-  }, "confirm_subscription")
 end
 
 function Socket:onMessage(callback)
