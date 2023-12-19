@@ -1,13 +1,15 @@
-Socket = {}
+local url = nil
+local ws = nil
+local hooks = {}
 
-local function getConnection(url)
-  local ws
-
+local function getConnection()
   local _status, err = pcall(function()
+    print(url)
     ws = assert(http.websocket(url))
   end)
 
   if err then
+    print(err)
     error("Could not connect to server. Is it running?")
   else
     print("Connected to server")
@@ -16,33 +18,13 @@ local function getConnection(url)
   end
 end
 
-function Socket:new()
-  local obj = {
-    ws = nil,
-
-    hooks = {},
-
-    actions = {},
-
-    url = nil,
-
-    subscribe = nil,
-  }
-
-  setmetatable(obj, self)
-
-  self.__index = self
-
-  return obj
+local function send(message)
+  ws.send(message)
 end
 
-function Socket:send(message)
-  self.ws.send(message)
-end
-
-function Socket:expectResponse(callback)
+local function expectResponse(callback)
   while true do
-    local data = self.ws.receive()
+    local data = ws.receive()
 
     if data then
       callback(data)
@@ -52,11 +34,11 @@ function Socket:expectResponse(callback)
   end
 end
 
-function Socket:onMessage(callback)
-  table.insert(self.hooks, callback)
+local function onMessage(callback)
+  table.insert(hooks, callback)
 end
 
-function Socket:handleData(data, callback)
+local function handleData(data, callback)
   local json_data = textutils.unserialiseJSON(data)
 
   if json_data then
@@ -64,22 +46,22 @@ function Socket:handleData(data, callback)
   end
 end
 
-function Socket:readMessages()
-  local event = self.ws.receive(0.5)
+local function readMessages()
+  local event = ws.receive(0.5)
 
   if event ~= nil then
-    self:handleData(event, function (data)
-      for _, hook in ipairs(self.hooks) do
+    handleData(event, function (data)
+      for _, hook in ipairs(hooks) do
         hook(data)
       end
     end)
   end
 end
 
-function Socket:listen()
+local function listen()
   while true do
     local _status, err = pcall(function()
-      self:readMessages()
+      readMessages()
     end)
 
     if err then
@@ -89,7 +71,7 @@ function Socket:listen()
       sleep(5)
 
       local _status, retryErr = pcall(function()
-        self.ws = getConnection(self.url)
+        ws = getConnection(url)
 
         print("Connection re-established")
       end)
@@ -105,20 +87,20 @@ function Socket:listen()
   end
 end
 
-local function listen(callback)
-  local socket = Socket:new()
-
-  local args = callback(socket)
-
-  socket.url = args.url
-  socket.subscribe = args.subscribe
-  socket.ws = getConnection(socket.url)
-
-  args.subscribe()
-
-  socket:listen()
-end
-
 return {
-  listen = listen,
+  listen = function(callback)
+    local args = callback()
+
+    print(args.url)
+    url = args.url
+
+    ws = getConnection()
+
+    args.subscribe()
+
+    listen()
+  end,
+  send = send,
+  onMessage = onMessage,
+  expectResponse = expectResponse,
 }

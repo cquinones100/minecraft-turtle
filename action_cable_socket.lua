@@ -1,7 +1,7 @@
 local Socket = require("Socket")
 
 local function listen(callback)
-  Socket.listen(function(socket)
+  Socket.listen(function()
     local sendMessage = function(table)
       table.command = table.command or "message"
 
@@ -13,11 +13,11 @@ local function listen(callback)
 
       local serialized_table = textutils.serialiseJSON(table)
 
-      socket:send(serialized_table)
+      Socket.send(serialized_table)
     end
 
     local function onMessage(messageCallback)
-      socket:onMessage(messageCallback)
+      Socket.onMessage(messageCallback)
     end
 
     local function subscribe()
@@ -25,7 +25,7 @@ local function listen(callback)
         command = "subscribe",
       })
 
-      socket:expectResponse(function (response)
+      Socket.expectResponse(function (response)
         if response then
           local json_data = textutils.unserialiseJSON(response)
 
