@@ -19,7 +19,7 @@ local function getConnection()
 end
 
 local function send(message)
-  ws.send(message)
+  ws.send(textutils.serializeJSON(message))
 end
 
 local function expectResponse(callback)
@@ -27,9 +27,9 @@ local function expectResponse(callback)
     local data = ws.receive()
 
     if data then
-      callback(data)
-
-      break
+      if callback(textutils.unserialiseJSON(data)) then
+        break
+      end
     end
   end
 end

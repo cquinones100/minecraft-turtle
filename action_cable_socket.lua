@@ -1,4 +1,4 @@
-local Socket = require("Socket")
+local Socket = require("socket.Socket")
 
 local function listen(callback)
   Socket.listen(function()
@@ -11,9 +11,7 @@ local function listen(callback)
 
       table.identifier = textutils.serialiseJSON(identifier)
 
-      local serialized_table = textutils.serialiseJSON(table)
-
-      Socket.send(serialized_table)
+      Socket.send(table)
     end
 
     local function onMessage(messageCallback)
@@ -25,15 +23,9 @@ local function listen(callback)
         command = "subscribe",
       })
 
-      Socket.expectResponse(function (response)
-        if response then
-          local json_data = textutils.unserialiseJSON(response)
-
-          if json_data then
-            if json_data.type == "confirm_subscription" then
-              return json_data
-            end
-          end
+      Socket.expectResponse(function(response)
+        if response.type == "confirm_subscription" then
+          return true
         end
       end)
 
