@@ -19,21 +19,21 @@ function setupCoordinates()
 end
 
 local run = function()
-  local coordinates = setupCoordinates()
-
-  local rollCall = function(socket)
-    socket.sendMessage({
-      command = "message",
-
-      data = textutils.serialiseJSON({
-        action = "acknowledgement",
-        computer_id = os.getComputerID(),
-        coordinates = coordinates,
-      }),
-    })
-  end
-
   listen(function(socket)
+    local coordinates = setupCoordinates()
+
+    local rollCall = function(socket)
+      socket.sendMessage({
+        command = "message",
+
+        data = textutils.serialiseJSON({
+          action = "acknowledgement",
+          computer_id = os.getComputerID(),
+          coordinates = coordinates,
+        }),
+      })
+    end
+
     rollCall(socket)
 
     socket.onMessage(function(data)

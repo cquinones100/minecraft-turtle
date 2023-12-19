@@ -24,22 +24,12 @@ local function listen(callback)
 
   socket:expectResponse("confirm_subscription")
 
-  print("Connected to server")
-
   callback({
     sendMessage = sendMessage,
     onMessage = onMessage,
   })
 
- local _status, err = pcall(function ()
-    socket:listen()
-  end)
-
-  if err then
-    socket = Socket:new("ws://localhost:3001/cable")
-
-    socket:listen()
-  end
+  socket:listen()
 end
 
 return listen

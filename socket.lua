@@ -1,16 +1,34 @@
 local pretty = require "cc.pretty"
 Socket = {}
 
+function getConnection(url)
+  local ws
+
+  local _status, err = pcall(function()
+    ws = assert(http.websocket(url))
+  end)
+
+  if err then
+    error("Could not connect to server. Is it running?")
+  else
+    print("Connected to server")
+
+    return ws
+  end
+end
+
 function Socket:new(url)
   local obj = {
-    ws = assert(http.websocket(url)),
+    ws = nil,
 
     hooks = {},
 
     actions = {},
 
-    channel = channel,
+    url = url
   }
+
+  obj.ws = getConnection(url)
 
   setmetatable(obj, self)
 
@@ -63,15 +81,25 @@ function Socket:readMessages()
   end
 end
 
-function Socket:doActions()
-  for _, action in pairs(self.actions) do
-    action()
-  end
-end
-
 function Socket:listen()
   while true do
-    self:readMessages()
+    local _status, err = pcall(function()
+      self:readMessages()
+    end)
+
+    if err then
+      print("Websocket connection appears to have been closed. Retrying in 5 seconds")
+
+      sleep(5)
+
+      local _status, _err = pcall(function()
+        self.ws = getConnection(self.url)
+      end)
+
+      if not err then
+        break
+      end
+    end
   end
 end
 
