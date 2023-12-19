@@ -83,6 +83,7 @@ function Socket:listen()
     end)
 
     if err then
+      print(err)
       print("Websocket connection appears to have been closed. Retrying in 5 seconds")
 
       sleep(5)

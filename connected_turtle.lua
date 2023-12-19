@@ -37,20 +37,31 @@ local run = function()
     rollCall()
 
     socket.onMessage(function(data)
+      local function sendMessage(newMessage)
+        local message_to_send = {
+          data = {
+            computer_id = os.getComputerID(),
+            job_id = data.message.job_id,
+            original_message = data.message,
+          }
+        }
+
+        for key, value in pairs(newMessage) do
+          message_to_send.data[key] = value
+        end
+
+        message_to_send.data = textutils.serialiseJSON(message_to_send.data)
+
+        socket.sendMessage(message_to_send)
+      end
+
       if type(data.message) == "table" then
         if data.message.type == 'turtle_action' or data.message.type == 'chained_action' then
           for _, action in ipairs(data.message.actions) do
             turtle[action]()
           end
 
-          socket.sendMessage({
-            data = textutils.serialiseJSON({
-              action = "action_done",
-              computer_id = os.getComputerID(),
-              job_id = data.message.job_id,
-              original_message = data.message,
-            }),
-          })
+          sendMessage({ action = "action_done", })
         elseif data.message.type == 'turtle_query' then
           response = {}
 
@@ -58,15 +69,7 @@ local run = function()
             response[query] = turtle[query]()
           end
 
-          socket.sendMessage({
-            data = textutils.serialiseJSON({
-              action = "action_done",
-              computer_id = os.getComputerID(),
-              job_id = data.message.job_id,
-              original_message = data.message,
-              response = response,
-            }),
-          })
+          sendMessage({ action = "action_done", response = response })
         else
           print("Unknown message type")
         end
