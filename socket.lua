@@ -1,7 +1,6 @@
-local pretty = require "cc.pretty"
 Socket = {}
 
-function getConnection(url)
+local function getConnection(url)
   local ws
 
   local _status, err = pcall(function()
@@ -17,7 +16,7 @@ function getConnection(url)
   end
 end
 
-function Socket:new(url)
+function Socket:new()
   local obj = {
     ws = nil,
 
@@ -25,10 +24,10 @@ function Socket:new(url)
 
     actions = {},
 
-    url = url
-  }
+    url = nil,
 
-  obj.ws = getConnection(url)
+    subscribe = nil,
+  }
 
   setmetatable(obj, self)
 
@@ -41,18 +40,14 @@ function Socket:send(message)
   self.ws.send(message)
 end
 
-function Socket:expectResponse(type)
+function Socket:expectResponse(callback)
   while true do
     local data = self.ws.receive()
 
     if data then
-      local json_data = textutils.unserialiseJSON(data)
+      callback(data)
 
-      if json_data then
-        if json_data.type == type then
-          return json_data
-        end
-      end
+      break
     end
   end
 end
@@ -92,15 +87,37 @@ function Socket:listen()
 
       sleep(5)
 
-      local _status, _err = pcall(function()
+      local _status, retryErr = pcall(function()
         self.ws = getConnection(self.url)
+
+        print("Connection re-established")
       end)
 
-      if not err then
+      if retryErr then
+        error(retryErr)
+      end
+
+      if not retryErr then
         break
       end
     end
   end
 end
 
-return Socket
+local function listen(callback)
+  local socket = Socket:new()
+
+  local args = callback(socket)
+
+  socket.url = args.url
+  socket.subscribe = args.subscribe
+  socket.ws = getConnection(socket.url)
+
+  args.subscribe()
+
+  socket:listen()
+end
+
+return {
+  listen = listen,
+}

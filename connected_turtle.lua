@@ -22,7 +22,7 @@ local run = function()
   listen(function(socket)
     local coordinates = setupCoordinates()
 
-    local rollCall = function(socket)
+    local rollCall = function()
       socket.sendMessage({
         command = "message",
 
@@ -34,19 +34,16 @@ local run = function()
       })
     end
 
-    rollCall(socket)
+    rollCall()
 
     socket.onMessage(function(data)
       if type(data.message) == "table" then
         if data.message.type == 'turtle_action' or data.message.type == 'chained_action' then
-          pretty.pretty_print(data.message)
-
           for _, action in ipairs(data.message.actions) do
             turtle[action]()
           end
 
           socket.sendMessage({
-            command = "message",
             data = textutils.serialiseJSON({
               action = "action_done",
               computer_id = os.getComputerID(),
@@ -55,8 +52,6 @@ local run = function()
             }),
           })
         elseif data.message.type == 'turtle_query' then
-          pretty.pretty_print(data.message)
-
           response = {}
 
           for _, query in ipairs(data.message.queries) do
@@ -64,8 +59,6 @@ local run = function()
           end
 
           socket.sendMessage({
-            command = "message",
-
             data = textutils.serialiseJSON({
               action = "action_done",
               computer_id = os.getComputerID(),
